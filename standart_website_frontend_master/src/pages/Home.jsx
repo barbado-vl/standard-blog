@@ -13,39 +13,89 @@ export const Home = () => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.auth.data);
   const { posts, tags } = useSelector(state => state.posts);
+  const [tabValue, setTabValue] = React.useState('1');
 
   const isPostsLoading = posts.status === 'loading';
   const isTagssLoading = tags.status === 'loading';
+
+  const sortedPosts = [];
 
   React.useEffect(() => {
     dispatch(fetchPosts());
     dispatch(fetchTags());
   }, []);
 
+  const handleTabsChange = (event, newTabValue) => {
+    setTabValue(newTabValue);
+  };
+
+  function sortPosts() {
+    let sortedArray = [];
+    if (tabValue === "1") {
+      for(let i = posts.items.length - 1; i >= 0; i--) {
+        sortedArray.push(posts.items[i]);
+      }
+    }
+
+    if (tabValue === "2") {
+      sortedArray = posts.items.reduce((acc, curr) => {
+        const insertIndex = acc.findIndex(item => item.viewsCount < curr.viewsCount);
+        if(insertIndex === -1) {
+          acc.push(curr);
+        } else {
+          acc.splice(insertIndex, 0, curr);
+        }
+        return acc;
+      }, []);
+    }
+
+    return sortedArray;
+  }
+
+  const renderPosts = () => {
+    let tempArray;
+    
+    if (isPostsLoading) {
+      tempArray = [...Array(5)];
+      for (let i = 0; i < tempArray.length; i++) {
+        sortedPosts.push(
+          <Post key={i} isLoading={true} />);
+      }
+    } else {
+      tempArray = sortPosts();
+
+      for (let i = 0; i < tempArray.length; i++) {
+        let obj = tempArray[i];
+        sortedPosts.push(
+          <Post
+            id={obj._id}
+            title={obj.title}
+            imageUrl={obj.imageUrl ? `http://localhost:4444${obj.imageUrl}` : ''}
+            user={obj.user}
+            createdAt={obj.createdAt}
+            viewsCount={obj.viewsCount}
+            commentsCount={3}
+            tags={obj.tags}
+            isEditable={userData?._id === obj.user._id}
+          />);
+      }
+    }
+    return sortedPosts;
+  };
+
   return (
     <>
-      <Tabs style={{ marginBottom: 15 }} value={0} aria-label="basic tabs example">
-        <Tab label="Новые" />
-        <Tab label="Популярные" />
+      <Tabs
+        style={{ marginBottom: 15 }}
+        value={tabValue}
+        aria-label="basic tabs example"
+        onChange={handleTabsChange}>
+        <Tab label="Новые" value="1"/>
+        <Tab label="Популярные" value="2"/>
       </Tabs>
       <Grid container spacing={4}>
-        <Grid xs={8} item>
-          {(isPostsLoading ? [...Array(5)] : posts.items).map((obj, index) => 
-            isPostsLoading ? (
-              <Post key={index} isLoading={true} />
-            ) : (
-            <Post
-              id={obj._id}
-              title={obj.title}
-              imageUrl={obj.imageUrl ? `http://localhost:4444${obj.imageUrl}` : ''}
-              user={obj.user}
-              createdAt={obj.createdAt}
-              viewsCount={obj.viewsCount}
-              commentsCount={3}
-              tags={obj.tags}
-              isEditable={userData?._id === obj.user._id}
-            />
-          ))}
+        <Grid xs={8} item>          
+          { renderPosts() }
         </Grid>
         <Grid xs={4} item>
           <TagsBlock items={tags.items} isLoading={isTagssLoading} />
