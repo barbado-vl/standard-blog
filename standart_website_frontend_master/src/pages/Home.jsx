@@ -13,7 +13,9 @@ export const Home = () => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.auth.data);
   const { posts, tags } = useSelector(state => state.posts);
+
   const [tabValue, setTabValue] = React.useState('1');
+  const [tagTarget, setTagTarget] = React.useState('');
 
   const isPostsLoading = posts.status === 'loading';
   const isTagssLoading = tags.status === 'loading';
@@ -25,12 +27,22 @@ export const Home = () => {
     dispatch(fetchTags());
   }, []);
 
+  /* Фильтр и сортировка статей на вывод */
   const handleTabsChange = (event, newTabValue) => {
     setTabValue(newTabValue);
   };
 
-  function sortPosts() {
+  const clickTag = (event) => {
+    if (event.target.innerText === "Все") {
+      setTagTarget('');  
+    } else {
+      setTagTarget(event.target.innerText);
+    };
+  }
+
+  const sortAndFilteredPosts = () => {
     let sortedArray = [];
+
     if (tabValue === "1") {
       for(let i = posts.items.length - 1; i >= 0; i--) {
         sortedArray.push(posts.items[i]);
@@ -49,9 +61,10 @@ export const Home = () => {
       }, []);
     }
 
-    return sortedArray;
+    return tagTarget !== '' ? sortedArray.filter(item => item.tags.includes(tagTarget))
+                            : sortedArray;
   }
-
+  
   const renderPosts = () => {
     let tempArray;
     
@@ -62,7 +75,7 @@ export const Home = () => {
           <Post key={i} isLoading={true} />);
       }
     } else {
-      tempArray = sortPosts();
+      tempArray = sortAndFilteredPosts();
 
       for (let i = 0; i < tempArray.length; i++) {
         let obj = tempArray[i];
@@ -83,6 +96,7 @@ export const Home = () => {
     return sortedPosts;
   };
 
+  /* Render */
   return (
     <>
       <Tabs
@@ -98,7 +112,7 @@ export const Home = () => {
           { renderPosts() }
         </Grid>
         <Grid xs={4} item>
-          <TagsBlock items={tags.items} isLoading={isTagssLoading} />
+          <TagsBlock items={tags.items} homeHandleListClick={clickTag} isLoading={isTagssLoading}/>
           <CommentsBlock
             items={[
               {
