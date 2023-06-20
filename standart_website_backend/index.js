@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 import multer from 'multer'; 
 import cors from 'cors';
 
-import { UserController, PostController } from './controllers/index.js';
+import { UserController, PostController, CommentController } from './controllers/index.js';
 import { handleValidationErrors, checkAuth } from './utils/index.js';
 
-import { registerValidation, loginValidation, postCreateValidation } from './validations.js';
+import { registerValidation, loginValidation, postCreateValidation, commentCreateValidation } from './validations.js';
 
 
 const app = express();
@@ -52,6 +52,13 @@ app.get('/posts/:id', PostController.getOne);
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 app.delete('/posts/:id', checkAuth, PostController.remove);
 app.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update);
+
+app.get('/comments', CommentController.getNewAll);
+app.get('/comments/:id', CommentController.getPostComments);
+app.post('/comments', checkAuth, commentCreateValidation, handleValidationErrors, CommentController.create);
+app.delete('/comments/:id', checkAuth, CommentController.remove);
+app.patch('/comments/:id', checkAuth, commentCreateValidation, handleValidationErrors, CommentController.update);
+
 
 /* Сервер */
 app.listen(4444, (err) => {                // функцию указать обязательно, например вот такая
