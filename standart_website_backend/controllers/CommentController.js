@@ -2,10 +2,10 @@ import CommentModel from "../models/Comment.js";
 
 export const getNewAll = async (req, res) => {
     try {
-        const comments = await CommentModel.find()
+        const comments = await CommentModel.find({})
             .populate('user')      // вторым аргументом указать конкретные поля: 'fullName, avatarUrl'
             .limit(7)
-            .sort({ date: -1 })
+            .sort({ updatedAt: -1 })
             .exec();
 
         res.json(comments);
