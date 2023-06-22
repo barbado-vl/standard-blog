@@ -17,6 +17,13 @@ Backend и Frontend разделены на отдельные приложен�
   - [Авторизация](#backend-section-6)
   - [Валидация данных](#backend-section-7)
 - [Frontend](#frontend-section)
+  - [Платформа и зависимости](#frontend-section-1)
+  - [Структура и Архитектура](#frontend-section-2)
+  - [Конструкционные объекты](#frontend-section-3)
+  - [Axios (ф.о – запросы к backend)](#frontend-section-4)
+  - [Redux (ф.о – хранилище компонентов)](#frontend-section-5)
+  - [/pages/AddPost](#frontend-section-6)
+- [Домашнее задание](#home-work)
 
 ## Backend <a name="backend-section"></a>
 ### Платформа и зависимости <a name="backend-section-1"></a>
@@ -102,4 +109,11 @@ const app = express(); -- подключение модуля express, кото�
 - Создаем обработчик валидации, файл [handleValidationErors.js](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_backend/utils/handleValidationErrors.js) в папке utils с помощью функции validationResult, которую импортируем из express-validator. 
 
 ## Frontend <a name="frontend-section"></a>
+### Платформа и зависимости <a name="frontend-section-1"></a>
+### Структура и Архитектура <a name="frontend-section-2"></a>
+### Конструкционные объекты <a name="frontend-section-3"></a>
+### Axios (ф.о – запросы к backend) <a name="frontend-section-4"></a>
+### Redux (ф.о – хранилище компонентов) <a name="frontend-section-5"></a>
+### /pages/AddPost <a name="frontend-section-6"></a>
 
+## Домашнее задание <a name="home-work"></a>
