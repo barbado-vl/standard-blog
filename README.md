@@ -7,6 +7,8 @@
 
 Backend и Frontend разделены на отдельные приложения.
 
+Развертывания на Heroku и Versel не делал, т.к. на Heroku не срабатывает MFA, введение кода через Google Authenticate, а Versel требуется аутентификацию через SMS, российский номер не проходит, а платить за Onlinesim не хочется.
+
 Содержание:
 - [Backend](#backend-section)
   - [Платформа и зависимости](#backend-section-1)
@@ -302,3 +304,70 @@ CRUD модель.  Указываем адрес, который автомат
 
 
 ## Домашнее задание <a name="home-work"></a>
+**Tab-панель, кнопки Новые и Популярные**
+
+[/page/Home.jsx](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/pages/Home.jsx)
+
+Автор проекта использовал React компоненты из библиотеки mui, это Tabs и Tab, но без TabPanel. Разметка под данные статьи создана как отдельный компонент [Post](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/components/Post/index.jsx), который вызывается внутри Grid для каждой статьи отдельно. Статьи выводятся без сортировки.
+
+Задача 1 – связать Tabs и Grid. Это делается через параметр tabValue и метод обработчик события onChange компонента Tabs handleTabsChange(), который передает в tabValue значение свойства value из текущей «нажатой» вкладки. Далее tabValue служит флагом для сортировки статей.
+
+Задача 2 – сортировка статей.
+
+Переменная sortedPosts, куда буду заносится Post компоненты с данными статьи.
+
+Метод sortPosts, где в зависимости от значения параметра tabValue идет сортировка самих статей.
+
+Метод renderPosts служит для заполнения sortedPosts и возврате его при вызове.
+
+В разметке вызывается метод renderPosts.
+
+**Вывод статей по тэгам**
+
+[/page/Home.jsx](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/pages/Home.jsx)
+
+В backend есть метод [getLastTags](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_backend/controllers/PostController.js), который достает теги. На стороне frontend к нему идет обращение через redux, slice [posts.js](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/redux/slices/posts.js), метод fetchTags. Вызов реализован на странице [Home.jsx](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/pages/Home.jsx). Вывод данных идет в созданный компонент [TagsBlock](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/components/CommentsBlock.jsx). Внутри компонента используется React Mui компоненты SideBlock и List. В List используем тег href, чтобы создавать маршрут для будущей страницы, куда будут выведены статьи с данным тэгом. Задача – вывод статей, в которых присутствует данный тэг.
+
+Вопрос, что требуется? А – конкретная задача: вывод статей по тегу в отдельной пустой странице? Б -- фильтр статей по тегу вообще, вопрос реализации на усмотрение учеников.
+
+По «А» требуется: 
+1. новый rout: файл App.js добавляем импорт страницы и строчку в маршруты:
+  > <Route path=”/tags/:name” element={<Имя страницы/>}
+2. новая страница, куда перекопировать половину кода из Home.jsx,
+3. внутри отобрать статьи по нужному тэгу, как это делается для ДЗ по Tab панели.
+4. кастомизация страницы
+
+Проблема – не функционально, много дублирования кода, много дополнительной кастомизации.
+
+По «Б»:
+1. на странице Home.jsx использовать функцию sortedPosts, которая была создана для ДЗ «Tab панель…»; 
+  - нужно создать еще один useState с переменной, которая будет получать имя #Тэга;
+  - создать функцию обработчик события в компоненте TagsBlock;
+  - в функцию sortedPosts добавить новое условие.
+2. в компоненте TagsBloc:
+  - передаем функцию обработчик из Home;
+  - в ListItemButton вызываем событие onClick, вставляем обработчик.
+3. кастомизация:
+  - сброс фильтра, чтобы вывелись все статьи – для это в компоненте TagsBloc, перед <List/> вставляем отдельный элемент ListItemButton, с названием «Все», так же задаем событие onClick;
+  - подсвечивание текущего выделенного #Тэга -- в компоненте TagsBlock для всех ListItemButton реализуем свойство selected (подробнее смотреть в коде).
+
+**Комментарии**
+
+Что есть? На frontend компонент [CommentsBlock.jsx](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/components/CommentsBlock.jsx), где реализован React компонент List, куда передается список комментариев. Сам список – его нет. Компонент CommentsBlock.jsx вызывается на странице [Home.jsx](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/pages/Home.jsx) и [FullPost.jsx](https://github.com/barbado-vl/standart-blog/blob/master/standart_website_frontend_master/src/pages/FullPost.jsx), на обоих страницах прямо в разметке создается 2 комментария, которые отправляются в CommentsBlock.jsx.
+Задача – 1) реализовать модель комментариев, 2) в Home.jsx выводить новые комментарии (все или первые 10), 3) в FullPost.jsx выводить комментарии только по данной статье.
+
+1. Модель комментариев.
+  - На backend:
+    - Модель
+    - Валидация – текст, не забыть внедрить
+    - Контроллер с методами: create, update, delete, 2 метода get: getAllNew и getPostComments.
+  - На frontend:
+    - redux как для posts
+
+2. в Home.jsx выводить новые комментарии.
+3. в FullPost.jsx выводить комментарии только по данной статье.
+
+
+
+
+
